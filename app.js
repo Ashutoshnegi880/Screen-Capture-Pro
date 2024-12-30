@@ -2,11 +2,16 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const handbrake = require('handbrake-js');
+const os = require('os');
+const fs = require('fs')
+
+const username = os.userInfo().username; 
+
 const app = express();
 const PORT = 5500;
 
 // Define the destination path for saving videos
-const savePath = path.join('C:', 'Users', 'NEGI', 'Videos', 'Captures');
+const savePath = path.join('C:', 'Users', username, 'Videos', 'Captures', 'New');
 app.use(express.static(path.join(__dirname, "public")));
 
 // Configure multer to save files to the specified path
@@ -49,6 +54,10 @@ app.post('/upload', upload.single('video'), (req, res) => {
           })
         .on('end', () => {
             console.log('Video encoded successfully');
+            fs.unlink(path.join(savePath, `${req.file.filename}`), (err) => {
+                if (err) throw err;
+                console.log('path/file.txt was deleted');
+              });
             res.send({ status: 'File saved and encoded successfully!' });
         });
 });
